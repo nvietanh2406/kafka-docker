@@ -1,5 +1,86 @@
 # MySQL to Postgres Data Pipeline with Kafka Connect
 
+## Setup từ Git Repository
+
+### 1. Clone Repository
+```bash
+# Clone repository
+git clone https://github.com/nvietanh2406/kafka-docker.git
+
+# Di chuyển vào thư mục project
+cd kafka-docker
+```
+
+### 2. Cấp quyền thực thi cho scripts
+```bash
+# Windows (Git Bash hoặc WSL)
+chmod +x build.sh
+chmod +x apply-source-sink.sh
+
+# Hoặc trên PowerShell
+icacls build.sh /grant Everyone:F
+icacls apply-source-sink.sh /grant Everyone:F
+```
+
+### 3. Build và Start
+```bash
+# Build connectors
+./build.sh
+
+# Start containers
+docker-compose up -d
+
+# Apply connectors
+./apply-source-sink.sh
+```
+
+## Prerequisites (Yêu cầu)
+
+### 1. Docker Desktop for Windows
+- Cài đặt [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop)
+- Yêu cầu Windows 10/11 Pro, Enterprise hoặc Education
+- WSL2 backend được khuyến nghị
+
+### 2. Cấu hình Docker Desktop
+1. Mở Docker Desktop
+2. Vào Settings -> Resources:
+   - Memory: tối thiểu 8GB
+   - CPUs: tối thiểu 4 cores
+   - Disk image size: tối thiểu 50GB
+
+### 3. Cấu hình WSL2 (Khuyến nghị)
+1. Mở PowerShell với quyền Administrator
+2. Chạy lệnh:
+```powershell
+wsl --install
+```
+3. Cấu hình WSL2 làm backend mặc định:
+```powershell
+wsl --set-default-version 2
+```
+
+### 4. Port Requirements
+Đảm bảo các port sau không bị sử dụng:
+- 2181: Zookeeper
+- 9092: Kafka
+- 8081: Schema Registry
+- 8080: Kafka UI
+- 8083: Kafka Connect
+- 3306: MySQL
+- 5432: PostgreSQL
+
+### 5. Kiểm tra môi trường
+```powershell
+# Kiểm tra Docker version
+docker --version
+
+# Kiểm tra Docker Compose version
+docker-compose --version
+
+# Kiểm tra WSL version
+wsl --version
+```
+
 ## Cài đặt và Chạy
 
 1. Clone repository và chuẩn bị môi trường:
@@ -131,6 +212,27 @@ docker logs kafka-connect | grep -i error
 ```
 
 ## Troubleshooting
+
+### Git và Windows
+1. Đảm bảo git được cài đặt:
+```bash
+git --version
+```
+
+2. Nếu gặp lỗi line ending (CRLF/LF):
+```bash
+# Cấu hình git không tự động chuyển đổi line endings
+git config --global core.autocrlf false
+# Clone lại repository
+rm -rf kafka-docker
+git clone https://github.com/nvietanh2406/kafka-docker.git
+```
+
+3. Nếu không thể chạy .sh files:
+```bash
+# Sử dụng Git Bash
+"%ProgramFiles%\Git\bin\bash.exe" -c "./build.sh"
+```
 
 1. Nếu connector failed:
 ```bash

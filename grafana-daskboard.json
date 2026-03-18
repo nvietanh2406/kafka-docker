@@ -1,0 +1,144 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "panels": [],
+      "title": "DSC Infra - Kafka Broker Health (JMX Metrics)",
+      "type": "row"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 3 }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 1 },
+      "id": 2,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "title": "Broker State",
+      "targets": [
+        { "expr": "kafka_server_server_brokerstate{instance=\"$instance\"}", "refId": "A" }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "unit": "decbytes"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 6, "y": 1 },
+      "id": 3,
+      "title": "JVM Heap Memory Usage",
+      "targets": [
+        { "expr": "jvm_memory_usage_heap_used{instance=\"$instance\"}", "legendFormat": "Used", "refId": "A" }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 },
+      "id": 4,
+      "panels": [],
+      "title": "DSC Service - Topic & Consumer Monitoring (Exporter)",
+      "type": "row"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": { "unit": "ops" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 10 },
+      "id": 5,
+      "title": "Messages In Per Second (Rate 5m)",
+      "targets": [
+        { "expr": "sum(rate(kafka_topic_partition_current_offset{instance=\"$instance\"}[5m])) by (topic)", "legendFormat": "{{topic}}", "refId": "A" }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisPlacement": "right" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 10000 },
+              { "color": "red", "value": 100000 }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 },
+      "id": 6,
+      "title": "Consumer Group Lag",
+      "targets": [
+        { "expr": "sum(kafka_consumergroup_lag{instance=\"$instance\"}) by (consumergroup)", "legendFormat": "{{consumergroup}}", "refId": "A" }
+      ],
+      "type": "timeseries"
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "DSC_Env",
+        "query": "label_values(DSC_Env)",
+        "type": "query",
+        "datasource": "Prometheus",
+        "refresh": 1
+      },
+      {
+        "name": "instance",
+        "query": "label_values(kafka_server_server_brokerstate{DSC_Env=\"$DSC_Env\"}, instance)",
+        "type": "query",
+        "datasource": "Prometheus",
+        "refresh": 1
+      }
+    ]
+  },
+  "title": "DSC Kafka Dev Monitoring (Docker Compose)",
+  "uid": "dsc_kafka_dev",
+  "version": 1
+}
